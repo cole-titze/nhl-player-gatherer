@@ -9,5 +9,10 @@ namespace DataAccess.Repository
         {
             _dbContext = dbContext;
         }
+
+        public Task AddUpdatePlayers(List<PlayerValue> playersWithValues)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
