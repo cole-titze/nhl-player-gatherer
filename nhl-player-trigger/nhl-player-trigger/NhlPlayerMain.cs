@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using DataAccess.Models;
+using DataAccess.Repository;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using PlayerCollection.PlayerCollection;
@@ -18,8 +20,10 @@ namespace NhlPlayerTrigger
         {
             // Run Data Collection
             logger.LogInformation("Starting Data Collection");
+            var dbContext = new PlayerDbContext(connectionString);
+            var playerRepository = new PlayerValueRepository(dbContext);
 
-            var playerCollector = new PlayerCollector(logger);
+            var playerCollector = new PlayerCollector(logger, playerRepository);
             await playerCollector.GetPlayers();
             logger.LogInformation("Completed Data Collection");
 
