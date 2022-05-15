@@ -25,7 +25,7 @@ namespace PlayerCollection.PlayerCollection
             var ids = await _rosterRequestMaker.GetPlayerIds();
             var players = await _playerRequestMaker.GetPlayersByIds(ids);
             var playersWithValues = _playerValueCalculator.GetPlayerValues(players);
-            //await _repo.AddUpdatePlayers(playersWithValues);
+            await _repo.AddUpdatePlayers(playersWithValues);
         }
     }
 }

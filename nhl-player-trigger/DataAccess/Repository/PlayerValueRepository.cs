@@ -10,9 +10,10 @@ namespace DataAccess.Repository
             _dbContext = dbContext;
         }
 
-        public Task AddUpdatePlayers(List<PlayerValue> playersWithValues)
+        public async Task AddUpdatePlayers(List<PlayerValue> playersWithValues)
         {
-            throw new NotImplementedException();
+            await _dbContext.PlayerValue.AddRangeAsync(playersWithValues);
+            _dbContext.SaveChanges();
         }
     }
 }
