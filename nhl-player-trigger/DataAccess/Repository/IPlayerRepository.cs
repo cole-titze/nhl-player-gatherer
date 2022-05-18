@@ -10,5 +10,6 @@ namespace DataAccess.Repository
     public interface IPlayerRepository
     {
         Task AddUpdatePlayers(List<PlayerValue> playersWithValues);
+        Task<int> GetPlayerCountBySeason(int year);
     }
 }
