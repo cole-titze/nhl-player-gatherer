@@ -13,5 +13,10 @@ namespace DataAccess.Models
         {
             optionsBuilder.UseSqlServer(_connectionString);
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PlayerValue>()
+                .HasKey(c => new { c.id, c.startYear });
+        }
     }
 }

@@ -18,6 +18,6 @@ using (var scope = sp.CreateScope())
 {
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     var config = new ConfigurationBuilder().AddJsonFile("appsettings.Local.json").Build();
-    string connectionString = config.GetConnectionString("GamesDatabase");
+    string connectionString = config.GetConnectionString("PlayersDatabase");
     await collector.Main(logger, connectionString);
 }

@@ -1,4 +1,5 @@
 ﻿using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess.Repository
 {
@@ -12,8 +13,28 @@ namespace DataAccess.Repository
 
         public async Task AddUpdatePlayers(List<PlayerValue> playersWithValues)
         {
-            await _dbContext.PlayerValue.AddRangeAsync(playersWithValues);
-            _dbContext.SaveChanges();
+            var addList = new List<PlayerValue>();
+            var updateList = new List<PlayerValue>();
+            foreach(var player in playersWithValues)
+            {
+                var dbPlayer = _dbContext.PlayerValue.FirstOrDefault(p => p.id == player.id  && p.startYear == player.startYear);
+                if (dbPlayer == null)
+                    addList.Add(player);
+                else
+                {
+                    dbPlayer.value = player.value;
+                    updateList.Add(dbPlayer);
+                }
+            }
+            _dbContext.PlayerValue.AddRange(addList);
+            _dbContext.PlayerValue.UpdateRange(updateList);
+            // Save to database
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> GetPlayerCountBySeason(int year)
+        {
+            return await _dbContext.PlayerValue.Where(i => i.startYear == year).CountAsync();
         }
     }
 }

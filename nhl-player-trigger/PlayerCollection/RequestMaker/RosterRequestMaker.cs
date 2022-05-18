@@ -7,18 +7,19 @@ namespace PlayerCollection.RequestMaker
     public class RosterRequestMaker : IRosterRequestMaker
     {
         private const string _url = "http://statsapi.web.nhl.com/api/v1/teams/";
-        private const string _query = "/roster";
-        public async Task<List<PlayerStats>> GetPlayerIds()
+        private const string _query = "/roster?season=";
+        public async Task<List<PlayerStats>> GetPlayerIds(int year)
         {
-            var players = await GetPlayersFromRosters();
+            var players = await GetPlayersFromRosters(year);
             return players;
         }
-        public async Task<List<PlayerStats>> GetPlayersFromRosters()
+        private async Task<List<PlayerStats>> GetPlayersFromRosters(int year)
         {
             var players = new List<PlayerStats>();
             for(int teamId = 0; teamId < 60; teamId++)
             {
-                var response = await MakeRosterRequest(_url + teamId.ToString() + _query);
+                var yearStr = GetYearString(year);
+                var response = await MakeRosterRequest(_url + teamId.ToString() + _query + yearStr);
                 if (!response.IsSuccessStatusCode)
                     continue;
                 var teamPlayers = await BuildPlayers(response);
@@ -27,6 +28,13 @@ namespace PlayerCollection.RequestMaker
             }
             return players;
         }
+
+        private string GetYearString(int year)
+        {
+            var futureYear = year + 1;
+            return year.ToString() + futureYear.ToString();
+        }
+
         public async Task<HttpResponseMessage> MakeRosterRequest(string query)
         {
             HttpResponseMessage response;
@@ -65,10 +73,43 @@ namespace PlayerCollection.RequestMaker
                 {
                     name = player.person.fullName,
                     id = player.person.id,
+                    position = GetPosition(player),
                 };
+                if (mappedPlayer.position == POSITION.Goalie)
+                    continue;
                 players.Add(mappedPlayer);
             }
             return players;
+        }
+
+        private POSITION GetPosition(dynamic player)
+        {
+            string position = player.position.code;
+            POSITION playerPosition;
+            switch (position)
+            {
+                case "G":
+                    playerPosition = POSITION.Goalie;
+                    break;
+
+                case "L":
+                    playerPosition = POSITION.LeftWing;
+                    break;
+
+                case "R":
+                    playerPosition = POSITION.RightWing;
+                    break;
+
+                case "D":
+                    playerPosition = POSITION.Defenseman;
+                    break;
+
+                default:
+                    playerPosition = POSITION.LeftWing;
+                    break;
+            }
+
+            return playerPosition;
         }
 
         private bool InvalidTeam(dynamic message)

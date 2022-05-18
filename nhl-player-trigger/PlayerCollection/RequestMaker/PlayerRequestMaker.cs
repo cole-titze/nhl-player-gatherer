@@ -7,14 +7,15 @@ namespace PlayerCollection.RequestMaker
     public class PlayerRequestMaker : IPlayerRequestMaker
     {
         private const string _url = "http://statsapi.web.nhl.com/api/v1/people/";
-        private const string _query = "/stats?stats=statsSingleSeason&season=20212022";
-        public async Task<List<PlayerStats>> GetPlayersByIds(List<PlayerStats> players)
+        private const string _query = "/stats?stats=statsSingleSeason&season=";
+        public async Task<List<PlayerStats>> GetPlayersByIds(List<PlayerStats> players, int year)
         {
+            var yearStr = GetYearString(year);
             var mappedPlayers = new List<PlayerStats>();
             for(int i = 0; i < players.Count; i++)
             {
                 var player = players[i];
-                var response = await MakePlayerRequest(_url + player.id.ToString() + _query);
+                var response = await MakePlayerRequest(_url + player.id.ToString() + _query + yearStr);
                 if (!response.IsSuccessStatusCode)
                     continue;
                 var playerStats = await BuildPlayer(response);
@@ -24,6 +25,11 @@ namespace PlayerCollection.RequestMaker
             }
             
             return mappedPlayers;
+        }
+        private string GetYearString(int year)
+        {
+            var futureYear = year + 1;
+            return year.ToString() + futureYear.ToString();
         }
         private PlayerStats MapPlayer(PlayerStats player, PlayerStats playerStats)
         {
@@ -39,6 +45,7 @@ namespace PlayerCollection.RequestMaker
                 shotsOnGoal = playerStats.shotsOnGoal,
                 assists = playerStats.assists,
                 goals = playerStats.goals,
+                position = player.position,
             };
         }
         private async Task<PlayerStats> BuildPlayer(HttpResponseMessage response)
@@ -50,8 +57,8 @@ namespace PlayerCollection.RequestMaker
             if (InvalidPlayer(message))
                 return new PlayerStats();
 
-            var players = ParseMessageToPlayerStats(message);
-            return players;
+            var player = ParseMessageToPlayerStats(message);
+            return player;
         }
         private bool InvalidPlayer(dynamic message)
         {
@@ -68,7 +75,7 @@ namespace PlayerCollection.RequestMaker
             return new PlayerStats()
             {
                 gamesPlayed = rawPlayer.games,
-                faceoffPercent = rawPlayer.faceOffPct,
+                faceoffPercent = (rawPlayer.faceOffPct / 100),
                 plusMinus = rawPlayer.plusMinus,
                 penaltyMinutes = rawPlayer.pim,
                 blockedShots = rawPlayer.blocked,
