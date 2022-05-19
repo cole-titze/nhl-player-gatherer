@@ -350,3 +350,6 @@ MigrationBackup/
 .ionide/
 
 nhl-player-trigger/LocalRunning/appsettings.Local.json
+output/*
+nhl-player-trigger/output/*
+.DS_Store
