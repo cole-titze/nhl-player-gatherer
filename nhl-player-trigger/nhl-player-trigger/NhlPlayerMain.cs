@@ -31,12 +31,6 @@ namespace NhlPlayerTrigger
             var playerCollector = new PlayerCollector(logger, playerRepository, rosterRequestMaker, playerRequestMaker, playerValueCalculator);
             await playerCollector.GetAndStorePlayers();
             logger.LogInformation("Completed Data Collection");
-
-            // Run Data Cleaning
-            logger.LogInformation("Starting Data Cleaning");
-            //var dataCleaner = new PlayerValueGetter(logger, gamesDA, futureGamesDA, cleanGamesDA, futureCleanedGamesDA, dateRange);
-            //dataCleaner.CleanData();
-            logger.LogInformation("Completed Data Cleaning");
         }
 
     }

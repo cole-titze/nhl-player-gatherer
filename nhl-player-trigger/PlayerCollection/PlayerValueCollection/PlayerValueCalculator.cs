@@ -13,11 +13,13 @@ namespace PlayerCollection.PlayerValueCollection
                 {
                     name = player.name,
                     id = player.id,
-                    value = GetSinglePlayerValue(player)
-                });
+                    value = GetSinglePlayerValue(player),
+                    position = Mapper.PlayerPositionToString(player.position)
+            });
             }
             return playerValues;
         }
+
         // Player Game Score = ( (0.75 * G) + (.63A) + (0.075 * SOG) + (0.05 * BLK) – (0.075 * PIM) + (0.15 * PM) + ((17*GP*FOP)*.01) ) / GP
         private double GetSinglePlayerValue(PlayerStats player)
         {
@@ -29,7 +31,7 @@ namespace PlayerCollection.PlayerValueCollection
 
             // Ignore faceoffs unless player is a center
             if (player.position == POSITION.Center)
-                value += 17 * player.gamesPlayed * player.faceoffPercent * .01;
+                value += 17 * player.faceoffPercent * .01;
 
             return Math.Max(value*60, 0);
         }
