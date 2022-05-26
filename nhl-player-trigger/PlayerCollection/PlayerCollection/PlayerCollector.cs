@@ -37,8 +37,8 @@ namespace PlayerCollection.PlayerCollection
                 var playerCount = await _repo.GetPlayerCountBySeason(year);
                 // Skip if data is already in db and not the current year
                 // If current year data could be incomplete so run anyways
-                //if (playerCount > _cutOffCount && year < dateRange.EndYear)
-                    //continue;
+                if (playerCount > _cutOffCount && year < dateRange.EndYear)
+                    continue;
                 var ids = await _rosterRequestMaker.GetPlayerIds(year);
                 var players = await _playerRequestMaker.GetPlayersByIds(ids, year);
                 var playersWithValues = _playerValueCalculator.GetPlayerValues(players);
