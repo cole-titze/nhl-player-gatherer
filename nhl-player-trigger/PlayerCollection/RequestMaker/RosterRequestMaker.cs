@@ -67,49 +67,20 @@ namespace PlayerCollection.RequestMaker
             var roster = message.roster;
             foreach(var player in roster)
             {
-                if (player.position.code == "G")
+                string positionCode = player.position.code;
+                if (positionCode == "G")
                     continue;
                 var mappedPlayer = new PlayerStats()
                 {
                     name = player.person.fullName,
                     id = player.person.id,
-                    position = GetPosition(player),
+                    position = Mapper.StringPositionToPosition(positionCode),
                 };
                 if (mappedPlayer.position == POSITION.Goalie)
                     continue;
                 players.Add(mappedPlayer);
             }
             return players;
-        }
-
-        private POSITION GetPosition(dynamic player)
-        {
-            string position = player.position.code;
-            POSITION playerPosition;
-            switch (position)
-            {
-                case "G":
-                    playerPosition = POSITION.Goalie;
-                    break;
-
-                case "L":
-                    playerPosition = POSITION.LeftWing;
-                    break;
-
-                case "R":
-                    playerPosition = POSITION.RightWing;
-                    break;
-
-                case "D":
-                    playerPosition = POSITION.Defenseman;
-                    break;
-
-                default:
-                    playerPosition = POSITION.LeftWing;
-                    break;
-            }
-
-            return playerPosition;
         }
 
         private bool InvalidTeam(dynamic message)

@@ -23,6 +23,7 @@ namespace DataAccess.Repository
                 else
                 {
                     dbPlayer.value = player.value;
+                    dbPlayer.position = player.position;
                     updateList.Add(dbPlayer);
                 }
             }
