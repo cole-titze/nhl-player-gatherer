@@ -8,10 +8,10 @@ namespace PlayerCollection.RequestMaker
     {
         private const string _url = "http://statsapi.web.nhl.com/api/v1/people/";
         private const string _query = "/stats?stats=statsSingleSeason&season=";
-        public async Task<List<PlayerStats>> GetPlayersByIds(List<PlayerStats> players, int year)
+        public async Task<List<IPlayerStats>> GetPlayersByIds(List<IPlayerStats> players, int year)
         {
             var yearStr = GetYearString(year);
-            var mappedPlayers = new List<PlayerStats>();
+            var mappedPlayers = new List<IPlayerStats>();
             for(int i = 0; i < players.Count; i++)
             {
                 var player = players[i];
@@ -31,24 +31,15 @@ namespace PlayerCollection.RequestMaker
             var futureYear = year + 1;
             return year.ToString() + futureYear.ToString();
         }
-        private PlayerStats MapPlayer(PlayerStats player, PlayerStats playerStats)
+        private IPlayerStats MapPlayer(IPlayerStats player, IPlayerStats playerStats)
         {
-            return new PlayerStats()
-            {
-                id = player.id,
-                name = player.name,
-                gamesPlayed = playerStats.gamesPlayed,
-                faceoffPercent = playerStats.faceoffPercent,
-                plusMinus = playerStats.plusMinus,
-                penaltyMinutes = playerStats.penaltyMinutes,
-                blockedShots = playerStats.blockedShots,
-                shotsOnGoal = playerStats.shotsOnGoal,
-                assists = playerStats.assists,
-                goals = playerStats.goals,
-                position = player.position,
-            };
+            playerStats.id = player.id;
+            playerStats.name = player.name;
+            playerStats.position = player.position;
+
+            return playerStats;
         }
-        private async Task<PlayerStats> BuildPlayer(HttpResponseMessage response)
+        private async Task<IPlayerStats> BuildPlayer(HttpResponseMessage response)
         {
             // Get data as Json string 
             string data = await response.Content.ReadAsStringAsync();
@@ -66,11 +57,19 @@ namespace PlayerCollection.RequestMaker
                 return true;
             return false;
         }
-        private PlayerStats ParseMessageToPlayerStats(dynamic message)
+        private IPlayerStats ParseMessageToPlayerStats(dynamic message)
         {
             if (message.stats[0].splits.Count == 0)
                 return new PlayerStats();
             var rawPlayer = message.stats[0].splits[0].stat;
+
+            if(rawPlayer.faceOffPct == null)
+                return new GoalieStats()
+                {
+                    goalsAgainst = rawPlayer.goalsAgainst,
+                    saves = rawPlayer.saves,
+                    gamesStarted = rawPlayer.gamesStarted,
+                };
 
             return new PlayerStats()
             {

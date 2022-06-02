@@ -4,6 +4,6 @@ namespace PlayerCollection.PlayerValueCollection
 {
     public interface IPlayerValueCalculator
     {
-        List<PlayerValue> GetPlayerValues(List<PlayerStats> players);
+        List<PlayerValue> GetPlayerValues(List<IPlayerStats> players);
     }
 }

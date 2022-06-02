@@ -8,14 +8,14 @@ namespace PlayerCollection.RequestMaker
     {
         private const string _url = "http://statsapi.web.nhl.com/api/v1/teams/";
         private const string _query = "/roster?season=";
-        public async Task<List<PlayerStats>> GetPlayerIds(int year)
+        public async Task<List<IPlayerStats>> GetPlayerIds(int year)
         {
             var players = await GetPlayersFromRosters(year);
             return players;
         }
-        private async Task<List<PlayerStats>> GetPlayersFromRosters(int year)
+        private async Task<List<IPlayerStats>> GetPlayersFromRosters(int year)
         {
-            var players = new List<PlayerStats>();
+            var players = new List<IPlayerStats>();
             for(int teamId = 0; teamId < 60; teamId++)
             {
                 var yearStr = GetYearString(year);
@@ -49,35 +49,43 @@ namespace PlayerCollection.RequestMaker
             }
             return response;
         }
-        private async Task<List<PlayerStats>> BuildPlayers(HttpResponseMessage response)
+        private async Task<List<IPlayerStats>> BuildPlayers(HttpResponseMessage response)
         {
             // Get data as Json string 
             string data = await response.Content.ReadAsStringAsync();
             // Add Json string conversion to hard object
             var message = JsonConvert.DeserializeObject<dynamic>(data);
             if (InvalidTeam(message))
-                return new List<PlayerStats>();
+                return new List<IPlayerStats>();
 
             var players = ParseMessageToPlayers(message);
             return players;
         }
-        private List<PlayerStats> ParseMessageToPlayers(dynamic message)
+        private List<IPlayerStats> ParseMessageToPlayers(dynamic message)
         {
-            var players = new List<PlayerStats>();
+            var players = new List<IPlayerStats>();
             var roster = message.roster;
             foreach(var player in roster)
             {
+                IPlayerStats mappedPlayer;
                 string positionCode = player.position.code;
                 if (positionCode == "G")
-                    continue;
-                var mappedPlayer = new PlayerStats()
+                    mappedPlayer = new GoalieStats()
+                    {
+                        name = player.person.fullName,
+                        id = player.person.id,
+                        position = Mapper.StringPositionToPosition(positionCode),
+                    };
+                else
                 {
-                    name = player.person.fullName,
-                    id = player.person.id,
-                    position = Mapper.StringPositionToPosition(positionCode),
-                };
-                if (mappedPlayer.position == POSITION.Goalie)
-                    continue;
+                    mappedPlayer = new PlayerStats()
+                    {
+                        name = player.person.fullName,
+                        id = player.person.id,
+                        position = Mapper.StringPositionToPosition(positionCode),
+                    };
+                }
+
                 players.Add(mappedPlayer);
             }
             return players;

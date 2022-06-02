@@ -4,6 +4,6 @@ namespace PlayerCollection.RequestMaker
 {
     public interface IRosterRequestMaker
     {
-        Task<List<PlayerStats>> GetPlayerIds(int year);
+        Task<List<IPlayerStats>> GetPlayerIds(int year);
     }
 }
