@@ -4,6 +4,6 @@ namespace PlayerCollection.RequestMaker
 {
     public interface IPlayerRequestMaker
     {
-        Task<List<PlayerStats>> GetPlayersByIds(List<PlayerStats> ids, int year);
+        Task<List<IPlayerStats>> GetPlayersByIds(List<IPlayerStats> ids, int year);
     }
 }
