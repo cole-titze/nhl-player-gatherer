@@ -15,7 +15,7 @@ namespace NhlPlayerTrigger
         [FunctionName("Function1")]
         public async Task Run([TimerTrigger("0 0 4 * * *")]TimerInfo myTimer, ILogger logger)
         {
-            string connectionString = System.Environment.GetEnvironmentVariable("GamesDatabase", EnvironmentVariableTarget.Process);
+            string connectionString = System.Environment.GetEnvironmentVariable("PlayersDatabase", EnvironmentVariableTarget.Process);
             await Main(logger, connectionString);
         }
         public async Task Main(ILogger logger, string connectionString)
