@@ -28,7 +28,7 @@ namespace PlayerCollection.PlayerCollection
             // Should be moved up a level
             var dateRange = new DateRange()
             {
-                StartYear = 2012,
+                StartYear = 2008,
                 EndYear = GetEndSeason(DateTime.UtcNow),
             };
 
