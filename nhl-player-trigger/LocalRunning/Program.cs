@@ -16,8 +16,14 @@ var sp = collection.BuildServiceProvider();
 // Get logger and run main
 using (var scope = sp.CreateScope())
 {
+    string? connectionString = Environment.GetEnvironmentVariable("PLAYERS_DATABASE");
+
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    var config = new ConfigurationBuilder().AddJsonFile("appsettings.Local.json").Build();
-    string connectionString = config.GetConnectionString("PlayersDatabase");
+    if (connectionString == null)
+    {
+        var config = new ConfigurationBuilder().AddJsonFile("appsettings.Local.json").Build();
+        connectionString = config.GetConnectionString("PLAYERS_DATABASE");
+    }
+
     await collector.Main(logger, connectionString);
 }
